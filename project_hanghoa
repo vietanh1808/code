@@ -1,0 +1,179 @@
+import os
+
+list_stt = [] 
+list_thongtinhoadon = []
+list_banghoadon = []
+danhsachloaihanghoa = []
+danhsachhanghoa = []
+
+# test = [{'sohoadon': '001', 'ngayhoadon': '23/2/2019', 'tenkhachhang': 'Cuong', 'banghoadon': []}, {'sohoadon': '002', 'ngayhoadon': '24/2/2019', 'tenkhachhang': 'Viet Anh', 'banghoadon': [{'stt': '1', 'hanghoa': 'Coca', 'soluong': '2', 'dongia': '15000', 'thanhtien': 30000}, {'stt': '2', 'hanghoa': 'Bim Bim', 'soluong': '5', 'dongia': '5000', 'thanhtien': 25000}]}]
+
+def load_danhsachhanghoa():
+    danhsach = {}
+    files = os.listdir('danhmuc/')
+    if 'hanghoa.csv' not in files:
+        return
+    with open('danhmuc/hanghoa.csv', 'r') as f:
+        data = f.readlines()
+        for lines in data:
+            lines = lines.split('#')
+            danhsach['id'] = lines[0]
+            danhsach['ten'] = lines[1]
+            danhsach['gia'] = lines[2]
+            if lines[3].endswith('\n'):
+                danhsach['loai'] = lines[3][0:len(lines[3])-1]
+        danhsachhanghoa.append(danhsach)
+    print(danhsachhanghoa)
+def load_danhsachloaihanghoa():
+    danhsach = {}
+    files = os.listdir('danhmuc/')
+    if 'loaihanghoa.csv' not in files:
+        return
+    with open('danhmuc/loaihanghoa.csv', 'r') as f:
+        data = f.readlines()
+        for lines in data:
+            lines = lines.split('#')
+            danhsach['id'] = lines[0]
+            if lines[1].endswith('\n'):
+                danhsach['ten'] = lines[1][0:len(lines[1])-1]
+        danhsachloaihanghoa.append(danhsach)
+    print(danhsachloaihanghoa)
+    
+
+def tao_loaihanghoa():
+    data = {}
+    id = input('>>> Moi ban nhap id cua loai hang hoa: ')
+    xem_id_daco = xem_loaihanghoa(id)
+    if xem_id_daco is None:
+        data['id'] = id
+        data['ten'] = input('>>> Moi ban nhap ten cua loai hang hoa: ')
+        danhsachloaihanghoa.append(data)
+    else:
+        print('[!] ID loai hang hoa nay da ton tai ! ')
+    return
+def xem_loaihanghoa(id = None):
+    if id is None:
+        id = input('>>> Xin moi ban nhap ten loai hang hoa can xem: ')
+    for loai in danhsachloaihanghoa:
+        if loai['id'] == id:
+            return loai
+def tao_hanghoa():
+    data = {}
+    data['id'] = input('>>> Xin moi ban nhap id cua hang hoa: ')
+    data['ten'] = input('>>> Xin moi ban nhap ten cua hang hoa: ')
+    data['loai'] = input('>>> Xin moi ban nhap ten cua loai hang hoa: ')
+    kiemtra_loai = xem_loaihanghoa(data['loai'])
+    kiemtra_id = xem_hanghoa(data['id'])
+    if kiemtra_loai is not None or kiemtra_id is None:
+        danhsachhanghoa.append(data)
+    elif kiemtra_id is not None:
+        print('[!] ID hang hoa nay DA ton tai. Ban hay nhap hang hoa khac')
+    elif kiemtra_loai is None:
+        print('[!] Loai hang hoa nay KHONG ton tai. Ban hay nhap hang hoa khac')
+def xem_hanghoa(id = None):
+    if id is None:
+        id = input('>>> Xin moi ban nhap ID hang hoa can xem: ')
+    for hanghoa in danhsachhanghoa:
+        if id == hanghoa['id']:
+            return hanghoa
+
+#######################################################################################
+print('-----------MENU---------------------')
+print('|[+] Tao hoa don: C                |')
+print('|[+] Xem thong tin hoa don: R      |')
+print('|[+] Tong doanh thu la: T          |')
+print('|[+] So luong hang hoa ban ra la: A|')
+print('|[+] Tao loai hang hoa: TLH        |')
+print('|[+] Xem loai hang hoa: XLH        |')
+print('|[+] Tao hang hoa: THH             |')
+print('|[+] Xem hang hoa: XHH             |')
+print('|[+] Thoat: E                      |')
+print('------------------------------------')
+
+print('danhsachhanghoa: ', load_danhsachhanghoa())
+print('danhsachloaihanghoa: ', load_danhsachloaihanghoa())
+while True:
+    nhap = input('\n>>>> Chon chuc nang: ')
+    if nhap.upper() == 'TLH':
+        tao_loaihanghoa()
+    if nhap.upper() == 'XLH':
+        print('[+] Loai hang hoa: ', xem_loaihanghoa())
+    if nhap.upper() == 'THH':
+        tao_hanghoa()
+    if nhap.upper() == 'XHH':
+        print('[+] Hang hoa: ', xem_hanghoa())
+    if nhap in ['C','c']:
+        tongtien = 0
+        thongtinhoadon = {}
+        sohoadon = input('nhap so hoa don: ')
+        ngayhoadon = input('nhap ngay hoa don: ')
+        tenkhachhang = input('nhap ten khach hang: ')
+        thongtinhoadon['sohoadon'] = sohoadon       # thong tin khach hang
+        thongtinhoadon['ngayhoadon'] = ngayhoadon
+        thongtinhoadon['tenkhachhang'] = tenkhachhang
+        nhaphoadon = input('\n>>>> Ban co muon nhap bang hoa don khong?(y/n): ')  
+        thongtinhoadon['banghoadon'] = []
+        while nhaphoadon in ['','y']:
+            banghoadon = {}
+            banghoadon['stt'] = input('nhap so thu tu: ')
+            banghoadon['hanghoa'] = input('nhap ten hang hoa: ')
+            banghoadon['soluong'] = input('nhap so luong hang hoa: ')
+            banghoadon['dongia'] = input('nhap don gia hang hoa: ')
+            banghoadon['thanhtien'] = int(banghoadon['soluong']) * int(banghoadon['dongia'])
+            tongtien += banghoadon['thanhtien']
+            thongtinhoadon['banghoadon'].append(banghoadon)
+            nhaphoadon = input('\n>>>> Ban co muon nhap bang hoa don khong?(y/n): ')  
+        thongtinhoadon['tongtien'] = tongtien
+        list_thongtinhoadon.append(thongtinhoadon)
+        #print(list_thongtinhoadon)
+        #print(thongtinhoadon)
+
+    #elif nhap in ['a','A','t','T','r','R'] and list_thongtinhoadon == []:
+    #    print('\n[!!!] Chua co data ve khach hang, ban hay bam C de tao khach hang\n')
+    if nhap in ['a','A']:
+        tongsohanghoa = 0
+        doanhsoban = 0
+        tenhanghoa = input("nhap ten hang hoa can xem:")
+        for hoadon in list_thongtinhoadon:
+            for hanghoa in hoadon["danhsachhanghoa"]:
+                if hanghoa["tenhang"] == tenhanghoa:
+                    tongsohanghoa = tongsohanghoa + hanghoa["soluong"]
+                    doanhsoban = doanhsoban + hanghoa["thanhtien"]
+                    break 
+        print("Tong so hang hoa: ", tongsohanghoa)
+        print("Doanh so ban: ", doanhsoban)
+    if nhap in ['t','T']:
+        pass
+    if nhap in ['r','R']:
+        print ('+++++++++++++++++THONG TIN HOA DON+++++++++++++++++++++ ')
+        for ptu in list_thongtinhoadon:    
+            print ('So hoa don: ', ptu['sohoadon'])
+            print ('Ngay hoa don: ', ptu['ngayhoadon'])
+            print ('Nguoi mua: ', ptu['tenkhachhang'])
+            print ('+-------+----------+----------+----------+------------+')
+            print ('|  STT  | hang hoa | so luong | don gia  | thanh tien |')
+            print ('+-------+----------+----------+----------+------------+')
+
+            for danhsach in ptu['banghoadon']:
+                str_stt = str(danhsach['stt'])
+                str_soluong = str(danhsach['soluong'])
+                str_dongia = str(danhsach['dongia'])
+                str_thanhtien = str(danhsach['thanhtien'])
+                str_tongtien = str(thongtinhoadon['tongtien'])
+            
+                print ('|'+str_stt+(7-len(str_stt))*' ', end='')
+                print ('|'+danhsach['hanghoa']+(10-len(danhsach['hanghoa']))*' ', end='')                    
+                print ('|'+str_soluong+(10-len(str_soluong))*' ', end='')
+                print ('|'+str_dongia+(10-len(str_dongia))*' ', end='')
+                print ('|'+str_thanhtien+(12-len(str_thanhtien))*' '+'|')
+            print ('+-------+----------+----------+----------+------------+')
+            print ('|'+' '*29+'|tong tien: '+str_tongtien+' '*(12-len(str_tongtien))+'|')
+            print ('+-------+----------+----------+----------+------------+')
+
+    hoi = input('Ban co muon tiep tuc khong(y/n)?: ')
+    if hoi in ['yes','y','Y','']:
+        pass
+    else:
+        break
+    if hoi in ['e', 'E']:
+        break
