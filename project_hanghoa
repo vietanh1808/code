@@ -9,35 +9,35 @@ danhsachhanghoa = []
 # test = [{'sohoadon': '001', 'ngayhoadon': '23/2/2019', 'tenkhachhang': 'Cuong', 'banghoadon': []}, {'sohoadon': '002', 'ngayhoadon': '24/2/2019', 'tenkhachhang': 'Viet Anh', 'banghoadon': [{'stt': '1', 'hanghoa': 'Coca', 'soluong': '2', 'dongia': '15000', 'thanhtien': 30000}, {'stt': '2', 'hanghoa': 'Bim Bim', 'soluong': '5', 'dongia': '5000', 'thanhtien': 25000}]}]
 
 def load_danhsachhanghoa():
-    danhsach = {}
     files = os.listdir('danhmuc/')
     if 'hanghoa.csv' not in files:
         return
     with open('danhmuc/hanghoa.csv', 'r') as f:
         data = f.readlines()
         for lines in data:
+            danhsach = {}
             lines = lines.split('#')
             danhsach['id'] = lines[0]
             danhsach['ten'] = lines[1]
             danhsach['gia'] = lines[2]
             if lines[3].endswith('\n'):
                 danhsach['loai'] = lines[3][0:len(lines[3])-1]
-        danhsachhanghoa.append(danhsach)
-    print(danhsachhanghoa)
+            danhsachhanghoa.append(danhsach)
+    return danhsachhanghoa
 def load_danhsachloaihanghoa():
-    danhsach = {}
     files = os.listdir('danhmuc/')
     if 'loaihanghoa.csv' not in files:
         return
     with open('danhmuc/loaihanghoa.csv', 'r') as f:
         data = f.readlines()
-        for lines in data:
+        for lines in data: 
+            danhsach = {}
             lines = lines.split('#')
             danhsach['id'] = lines[0]
             if lines[1].endswith('\n'):
                 danhsach['ten'] = lines[1][0:len(lines[1])-1]
-        danhsachloaihanghoa.append(danhsach)
-    print(danhsachloaihanghoa)
+            danhsachloaihanghoa.append(danhsach)
+    return danhsachloaihanghoa
     
 
 def tao_loaihanghoa():
@@ -50,7 +50,10 @@ def tao_loaihanghoa():
         danhsachloaihanghoa.append(data)
     else:
         print('[!] ID loai hang hoa nay da ton tai ! ')
-    return
+    str_to_save = data['id'] + '#' + data['ten'] + '\n'
+    with open('danhmuc/loaihanghoa.csv', 'a') as f:
+        f.write(str_to_save)
+    
 def xem_loaihanghoa(id = None):
     if id is None:
         id = input('>>> Xin moi ban nhap ten loai hang hoa can xem: ')
@@ -61,21 +64,55 @@ def tao_hanghoa():
     data = {}
     data['id'] = input('>>> Xin moi ban nhap id cua hang hoa: ')
     data['ten'] = input('>>> Xin moi ban nhap ten cua hang hoa: ')
+    data['gia'] = input('>>> Xin moi ban nhap gia tien cua hang hoa: ')
     data['loai'] = input('>>> Xin moi ban nhap ten cua loai hang hoa: ')
     kiemtra_loai = xem_loaihanghoa(data['loai'])
     kiemtra_id = xem_hanghoa(data['id'])
-    if kiemtra_loai is not None or kiemtra_id is None:
+    if kiemtra_loai is not None and kiemtra_id is None:
         danhsachhanghoa.append(data)
     elif kiemtra_id is not None:
         print('[!] ID hang hoa nay DA ton tai. Ban hay nhap hang hoa khac')
+        return 
     elif kiemtra_loai is None:
         print('[!] Loai hang hoa nay KHONG ton tai. Ban hay nhap hang hoa khac')
+        return
+    str_to_save = data['id'] + '#' + data['ten'] + '#' +  data['gia'] + '#' + data['loai'] + '\n'
+    with open('danhmuc/hanghoa.csv', 'a') as f:
+        f.write(str_to_save)
 def xem_hanghoa(id = None):
     if id is None:
         id = input('>>> Xin moi ban nhap ID hang hoa can xem: ')
     for hanghoa in danhsachhanghoa:
         if id == hanghoa['id']:
             return hanghoa
+def ktra_sohoadon():
+    sohoadon = input('Moi ban nhap so hoa don: ')
+    for hoadon in list_thongtinhoadon:
+        if sohoadon in hoadon['sohoadon'] :
+            print("[!] So hoa don nay da ton tai. Xin moi ban nhap hoa don khac!")
+            return ktra_sohoadon()
+    return sohoadon
+def ktra_id_hanghoa(ktra = None):
+    if ktra == None:
+        id = input('>>> Moi ban nhap id hang hoa can mua: ')
+    else:
+        id = input('>>> Moi ban nhap id hang hoa can tinh tien: ')
+    for hanghoa in danhsachhanghoa:
+        if id not in hanghoa['id']:
+            print('[!] ID hang hoa nay KHONG ton tai. Moi ban nhap lai ID hang hoa!')
+            ktra_id_hanghoa(ktra)
+    return id 
+
+
+def tinhtien_id_hanghoa():
+    tinhtien = 'tinhtien'
+    id = ktra_id_hanghoa(tinhtien)
+    for hanghoa in load_danhsachhanghoa():
+        if hanghoa['id'] == id:
+            print('[+] Ten hang hoa: ' ,hanghoa['ten'])
+            print('[+] Don gia hang hoa: ', hanghoa['gia'])
+tinhtien_id_hanghoa()
+#print(ktra_id_hanghoa('002'))
 
 #######################################################################################
 print('-----------MENU---------------------')
@@ -89,9 +126,8 @@ print('|[+] Tao hang hoa: THH             |')
 print('|[+] Xem hang hoa: XHH             |')
 print('|[+] Thoat: E                      |')
 print('------------------------------------')
-
-print('danhsachhanghoa: ', load_danhsachhanghoa())
-print('danhsachloaihanghoa: ', load_danhsachloaihanghoa())
+print ("danhsachhanghoa: ", load_danhsachhanghoa())
+print ("danhsachloaihanghoa: ", load_danhsachloaihanghoa())
 while True:
     nhap = input('\n>>>> Chon chuc nang: ')
     if nhap.upper() == 'TLH':
@@ -105,9 +141,9 @@ while True:
     if nhap in ['C','c']:
         tongtien = 0
         thongtinhoadon = {}
-        sohoadon = input('nhap so hoa don: ')
-        ngayhoadon = input('nhap ngay hoa don: ')
-        tenkhachhang = input('nhap ten khach hang: ')
+        sohoadon = ktra_sohoadon()
+        ngayhoadon = input('Moi ban nhap ngay hoa don: ')
+        tenkhachhang = input('Moi ban nhap ten khach hang: ')
         thongtinhoadon['sohoadon'] = sohoadon       # thong tin khach hang
         thongtinhoadon['ngayhoadon'] = ngayhoadon
         thongtinhoadon['tenkhachhang'] = tenkhachhang
@@ -115,17 +151,17 @@ while True:
         thongtinhoadon['banghoadon'] = []
         while nhaphoadon in ['','y']:
             banghoadon = {}
-            banghoadon['stt'] = input('nhap so thu tu: ')
-            banghoadon['hanghoa'] = input('nhap ten hang hoa: ')
-            banghoadon['soluong'] = input('nhap so luong hang hoa: ')
-            banghoadon['dongia'] = input('nhap don gia hang hoa: ')
+            banghoadon['stt'] = input('Moi ban nhap so thu tu: ')
+            banghoadon['hanghoa'] = input('Moi ban nhap ten hang hoa: ')
+            banghoadon['soluong'] = input('Moi ban nhap so luong hang hoa: ')
+            banghoadon['dongia'] = input('Moi ban nhap don gia hang hoa: ')
             banghoadon['thanhtien'] = int(banghoadon['soluong']) * int(banghoadon['dongia'])
             tongtien += banghoadon['thanhtien']
             thongtinhoadon['banghoadon'].append(banghoadon)
             nhaphoadon = input('\n>>>> Ban co muon nhap bang hoa don khong?(y/n): ')  
         thongtinhoadon['tongtien'] = tongtien
         list_thongtinhoadon.append(thongtinhoadon)
-        #print(list_thongtinhoadon)
+        print(list_thongtinhoadon)
         #print(thongtinhoadon)
 
     #elif nhap in ['a','A','t','T','r','R'] and list_thongtinhoadon == []:
@@ -133,15 +169,15 @@ while True:
     if nhap in ['a','A']:
         tongsohanghoa = 0
         doanhsoban = 0
-        tenhanghoa = input("nhap ten hang hoa can xem:")
+        tenhanghoa = input(">>> Moi ban nhap ten hang hoa can xem:")
         for hoadon in list_thongtinhoadon:
             for hanghoa in hoadon["danhsachhanghoa"]:
                 if hanghoa["tenhang"] == tenhanghoa:
                     tongsohanghoa = tongsohanghoa + hanghoa["soluong"]
                     doanhsoban = doanhsoban + hanghoa["thanhtien"]
                     break 
-        print("Tong so hang hoa: ", tongsohanghoa)
-        print("Doanh so ban: ", doanhsoban)
+        print("[+] Tong so hang hoa: ", tongsohanghoa)
+        print("[+] Doanh so ban: ", doanhsoban)
     if nhap in ['t','T']:
         pass
     if nhap in ['r','R']:
@@ -169,11 +205,11 @@ while True:
             print ('+-------+----------+----------+----------+------------+')
             print ('|'+' '*29+'|tong tien: '+str_tongtien+' '*(12-len(str_tongtien))+'|')
             print ('+-------+----------+----------+----------+------------+')
-
+    
+    if nhap in ['e', 'E']:
+        break
     hoi = input('Ban co muon tiep tuc khong(y/n)?: ')
     if hoi in ['yes','y','Y','']:
         pass
     else:
-        break
-    if hoi in ['e', 'E']:
         break
