@@ -2,17 +2,18 @@
 import os
 import json
 
-print("+--------------MENU-----------------+")
-print("|Chon THH de tao hang hoa           |")
-print("|Chon XHH de xem hang hoa           |")
-print("|Chon TLH de tao loai hang hoa      |")
-print("|Chon XLH de xem loai hang hoa      |")
-print("|Chon C de tao hoa don              |")
-print("|Chon R de xem thong tin hoa don    |")
-print("|Chon T de tinh tong doanh thu      |")
-print("|Chon A de tinh tong hang hoa ban ra|")
-print("|Chon E de thoat                    |")
-print("+-----------------------------------+")
+print("+--------------MENU------------------------------------+")
+print("|Chon THH de tao hang hoa                              |")
+print("|Chon XHH de xem hang hoa                              |")
+print("|Chon TLH de tao loai hang hoa                         |")
+print("|Chon XLH de xem loai hang hoa                         |")
+print("|Chon C de tao hoa don                                 |")
+print("|Chon R de xem thong tin hoa don                       |")
+print("|Chon T de tinh tong doanh thu                         |")
+print("|Chon A de tinh tong hang hoa ban ra                   |")
+print("|Chon E de thoat                                       |")
+print("|Chon HH de xem hang theo thang                        |")
+print("+------------------------------------------------------+")
 
 danhsachhanghoa = []
 danhsachloaihanghoa = []
@@ -74,6 +75,7 @@ def load_hanghoa_luckhoidong():
   print("danhsachhanghoa:", danhsachhanghoa)
 	
 load_hanghoa_luckhoidong()
+load_loaihanghoa_luckhoidong()
 	
 def tao_loaihanghoa():
   data = {}
@@ -150,30 +152,61 @@ def xem_hanghoa(id = None):
       print(hanghoa)
       return hanghoa
 def ktra_id_hanghoa():
-  id = input("Moi ban nhap ID hang hoa: ")
-  for hanghoa in danhsachhanghoa:
-    if id == hanghoa['id']:
-      return hanghoa['ten'], hanghoa['giaban']
-  print("[!] ID nay khong ton tai. Ban hay nhap lai")
-  ktra_id_hanghoa()
+  while True:
+    id = input("Moi ban nhap ID hang hoa: ")
+    for hanghoa in danhsachhanghoa:
+      if id == hanghoa['id']:
+        return hanghoa['ten'], hanghoa['giaban']
 def ktra_sohoadon():
-  sohoadon = input('Moi ban nhap so hoa don: ')
-  for hoadon in danhsachhoadon:
-    if sohoadon in hoadon['sohoadon'] :
-          print("[!] So hoa don nay da ton tai. Xin moi ban nhap hoa don khac!")
-          return ktra_sohoadon()
-  return sohoadon
-def quanlyhoadon(hoadon):
-  hoadon = dict(hoadon)
-  str_to_save = str(hoadon) + "\n"
-  with open("quanlyhoadon.json", "a") as f:
-    json.dump(f,a)
+  path = os.listdir("hoadon/")
+  while True:
+    sohoadon = input('Moi ban nhap so hoa don: ')
+    str_test = sohoadon + '.json'
+    for file in path:
+      if str_test not in file:
+        return sohoadon
+        break
+    if path == []:
+      return sohoadon
+      break
 
+def TaoFileHoaDon(thongtin_hoadon,tenhoadon):
+    with open('hoadon/'+str(tenhoadon)+'.json','w') as wfile:
+        hoadon = json.dumps(thongtin_hoadon, indent=2)
+        wfile.write(hoadon)
+
+def mat_hang():
+  danhsachban = {}
+  for hanghoa in danhsachhanghoa:
+    danhsachban[hanghoa['ten']] = 0
+  return danhsachban
+
+def hanghoatheothang():
+  mathang = mat_hang()
+  hanghoa_chaynhat = 0
+  for file in os.listdir("danhmuc/"):
+    with open("danhmuc/"+file, 'r') as f:
+      data = json.load(f)
+    ten_hh = data['danhsachhanghoa']['ten']
+    if ten_hh in mathang:
+      mathang[ten_hh] += data['danhsachhanghoa']['soluong']
+  hanghoa_chamnhat = mathang['coca']
+  for hanghoa in mathang:
+    if mathang[hanghoa] > hanghoa_chaynhat:
+      hanghoa_chaynhat = mathang[hanghoa]
+    if mathang[hanghoa] < hanghoa_chamnhat:
+      hanghoa_chamnhat = mathang[hanghoa]
+  for key in mathang:
+    if mathang[key] == hanghoa_chaynhat:
+      print("[+] Hang hoa ban chay nhat: ", key)
+    elif mat_hang[key] == hanghoa_chamnhat:
+      print("[+] Hang hoa ban cham nhat: ", key)
+
+print(mat_hang())
 hanghoaban = {}
 
-
-load_loaihanghoa_luckhoidong()
-
+print("----------")
+print(hanghoatheothang())
 while True:
     x=input("=> chon chuc nang:")
     print("=> ban da chon chuc nang:",x)
@@ -188,7 +221,8 @@ while True:
     if x.upper() == 'C':
         print("moi ban tao hoa don")
         hoadon={}
-        hoadon["sohoadon"] = ktra_sohoadon()
+        sohoadon = ktra_sohoadon()
+        hoadon["sohoadon"] = sohoadon
         hoadon["ngayhoadon"]= input("nhap ngay hoa don :")
         hoadon["nguoimua"]= input("nhap nguoi mua hang :")
         hoadon["tongtientruocthue"] = 0
@@ -200,11 +234,13 @@ while True:
         while nhaphanghoa.upper() == 'Y':
             hanghoa = {}
             hanghoa["stt"] = input("nhap so thu tu: ")
-            ktra_id_hanghoa()
-            # print ten va don gia(int) o day
+            value_ten,value_gia = ktra_id_hanghoa()
+            print("Ten hang hoa: ", value_ten)
+            print("Gia hang hoa: ", value_gia)
+            hanghoa['ten'] = value_ten
             soluong = input("nhap so luong: ")
             hanghoa["soluong"] = int(soluong)
-            hanghoa["dongia"] = int(input("nhap don gia:"))
+            hanghoa["dongia"] = int(value_gia)
             hanghoa["thanhtien"] = hanghoa["soluong"] * hanghoa["dongia"]
             
             if hanghoa["ten"] in hanghoaban:
@@ -224,7 +260,7 @@ while True:
         
         hoadon["tongtien"] = hoadon["tongtientruocthue"] + hoadon["tongtientruocthue"]*hoadon["thue"]
         danhsachhoadon.append(hoadon)
-        quanlyhoadon(danhsachhoadon)
+        TaoFileHoaDon(hoadon, sohoadon)
         print("Kiemtra:", danhsachhoadon)
 
     if x.upper() == 'R':
@@ -267,9 +303,10 @@ while True:
                     tongsohanghoa = tongsohanghoa + hanghoa["soluong"]
                     doanhsoban = doanhsoban + hanghoa["thanhtien"]
                     break
+    
         print("Tong so hang hoa: ", tongsohanghoa)
         print("Doanh so ban: ", doanhsoban)
-    
+
     if x.upper() == 'E':
         print("Tam biet! Hen gap lai")
         break
