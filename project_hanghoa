@@ -92,8 +92,6 @@ def tao_loaihanghoa():
   with open('danhmuc/loaihanghoa.csv', 'a') as f:
 	    data = f.write(str_to_save)
 
-
-
 def xem_loaihanghoa(id = None):
   if id is None:
       id = input("xin moi nhap id loai hang hoa:")
@@ -101,7 +99,6 @@ def xem_loaihanghoa(id = None):
     if loai["id"] == id:
       print("loai hang hoa: ", loai)
       return loai
-
 
 def sua_loaihanghoa(id, data):
   pass
@@ -111,7 +108,6 @@ def xoa_loaihanghoa(id):
 
 def danhsach_loaihanghoa():
   return danhsachloaihanghoa
-
 
 def tao_hanghoa():
   data = {}
@@ -141,8 +137,6 @@ def tao_hanghoa():
   str_to_save = data["id"] + "#" + data["ten"] + '#' + data["giaban"] + "#" +  data["loaihanghoa_id"] + '\n'
   with open('danhmuc/hanghoa.csv', 'a') as f:
       data = f.write(str_to_save)
-  
-
 
 def xem_hanghoa(id = None):
   if id is None:
@@ -151,12 +145,14 @@ def xem_hanghoa(id = None):
     if hanghoa["id"] == id:
       print(hanghoa)
       return hanghoa
+
 def ktra_id_hanghoa():
   while True:
     id = input("Moi ban nhap ID hang hoa: ")
     for hanghoa in danhsachhanghoa:
       if id == hanghoa['id']:
         return hanghoa['ten'], hanghoa['giaban']
+
 def ktra_sohoadon():
   path = os.listdir("hoadon/")
   while True:
@@ -177,19 +173,27 @@ def TaoFileHoaDon(thongtin_hoadon,tenhoadon):
 
 def mat_hang():
   danhsachban = {}
+  loaihanghoaban = {}
   for hanghoa in danhsachhanghoa:
     danhsachban[hanghoa['ten']] = 0
-  return danhsachban
+  for loai in danhsachloaihanghoa:
+    tenlhh = loai['id']
+    loaihanghoaban[tenlhh] = {} 
+    loaihanghoaban[tenlhh]['soluong'] = 0
+    loaihanghoaban[tenlhh]['doanhthu'] = 0
+  return danhsachban, loaihanghoaban
+print(mat_hang())
 
-def hanghoatheothang():
-  mathang = mat_hang()
+def hanghoatheothang(mathang):
   hanghoa_chaynhat = 0
-  for file in os.listdir("danhmuc/"):
-    with open("danhmuc/"+file, 'r') as f:
+  for file in os.listdir("hoadon/"):
+    with open("hoadon/"+file, 'r') as f:
       data = json.load(f)
-    ten_hh = data['danhsachhanghoa']['ten']
-    if ten_hh in mathang:
-      mathang[ten_hh] += data['danhsachhanghoa']['soluong']
+    for ten in data['danhsachhanghoa']:
+      ten_hh = ten['ten']
+      if ten_hh in mathang:
+        mathang[ten_hh] += ten['soluong']
+
   hanghoa_chamnhat = mathang['coca']
   for hanghoa in mathang:
     if mathang[hanghoa] > hanghoa_chaynhat:
@@ -199,14 +203,41 @@ def hanghoatheothang():
   for key in mathang:
     if mathang[key] == hanghoa_chaynhat:
       print("[+] Hang hoa ban chay nhat: ", key)
-    elif mat_hang[key] == hanghoa_chamnhat:
+    elif mathang[key] == hanghoa_chamnhat:
       print("[+] Hang hoa ban cham nhat: ", key)
 
-print(mat_hang())
+def loaihh_chaynhat(loaihang):
+  soluong_chaynhat = doanhthu_chaynhat = 0
+  for file in os.listdir("hoadon/"):
+    with open("hoadon/"+file, 'r') as f:
+      data = json.load(f)
+    for ten in data['danhsachhanghoa']:
+      ten_hh = ten['ten']
+      for hh in danhsachhanghoa:
+        if hh['ten'] == ten_hh:
+          id_loaihh = hh['loaihanghoa_id']
+          break
+      if id_loaihh in loaihang:
+        loaihang[id_loaihh]['soluong'] += ten['soluong']
+        loaihang[id_loaihh]['doanhthu'] += ten['thanhtien']
+  for loai in loaihang:
+    if loaihang[loai]['soluong'] > soluong_chaynhat:
+      soluong_chaynhat = loaihang[loai]['soluong']
+    if loaihang[loai]['doanhthu'] > doanhthu_chaynhat:  
+      doanhthu_chaynhat = loaihang[loai]['doanhthu']
+  for loaihh in loaihang:
+    if loaihang[loaihh]['soluong'] == soluong_chaynhat :
+      print("[+] Loai hang hoa co so luong chay nhat la: ", loaihh)
+    if loaihang[loaihh]['doanhthu'] == doanhthu_chaynhat:
+      print("[+] Loai hang hoa co doanh thu chay nhat la: ", loaihh)
 hanghoaban = {}
+mathang,loaihang = mat_hang()
+print("-----------------------------------------")
+print(loaihang)
+hanghoatheothang(mathang)
+print("-----------------------------------------")
+loaihh_chaynhat(loaihang)
 
-print("----------")
-print(hanghoatheothang())
 while True:
     x=input("=> chon chuc nang:")
     print("=> ban da chon chuc nang:",x)
