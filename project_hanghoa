@@ -1,5 +1,6 @@
 import os
 import json
+
 print("+--------------MENU------------------------------------+")
 print("|Chon THH de tao hang hoa                              |")
 print("|Chon XHH de xem hang hoa                              |")
