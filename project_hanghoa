@@ -340,5 +340,52 @@ while True:
     if x.upper() == 'E':
         print("Tam biet! Hen gap lai")
         break
+	
+import os
+
+danhsachloaihanghoa = []
+danhsachhanghoa = []
+
+class loaihanghoa:
+    id = None
+    ten = None
+    
+    def __init__(self, id, ten):
+        self.id = id
+        self.ten = ten
+    def kiemtra():
+        files = os.listdir("danhmuc")
+        if "loaihanghoa.csv" not in files:
+            return
+        with open('danhmuc/loaihanghoa.csv', 'r') as f:
+            line = f.readline()
+            while line:
+                str_to_reads = line.split("#")
+                if len(str_to_reads) > 1:
+                    loaihanghoa = {}
+                    loaihanghoa["id"] = str_to_reads[0]
+                    tenloai = str_to_reads[1]
+                    if tenloai.endswith('\n'):
+                        tenloai = tenloai[0:len(tenloai)-1]
+                    loaihanghoa["ten"] = tenloai
+                    danhsachloaihanghoa.append(loaihanghoa)
+                line = f.readline()
+        return danhsachloaihanghoa
+    def sua_hh():
+        kiemtra_loaihh = kiemtra()
+        if kiemtra_loaihh is None or kiemtra_loaihh == []:
+            while True:
+                nhap = input("Moi ban nhap ID can sua: ")
+                for loai_hh in danhsachloaihanghoa:
+                    if nhap in loai_hh['id']:
+                        loai_hh['ten'] = input("Moi ban nhap ten hang hoa moi: ")
+                        return danhsachloaihanghoa
+        else:
+            print("File cua ban chua co du lieu!")
+            return
+    def xoa_hh():
+        pass
+    def them_hh():
+        pass
         
 
