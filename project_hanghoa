@@ -387,5 +387,58 @@ class loaihanghoa:
         pass
     def them_hh():
         pass
+	
+	
+import os
+danhsachuser = []
+
+def load_user_luckhoidong():
+    with open("danhsachuser.csv", "r") as f:
+        line = f.readline()
+        while line:
+            user = {}
+            str_cut = line.split("#") 
+            user['id'] = str_cut[0]
+            user['name'] = str_cut[1]
+            user['pass'] = str_cut[2][0:len(str_cut[2]) - 1]
+            danhsachuser.append(user)
+            line = f.readline()
+        else:
+            return 1
+    print(danhsachuser)
+load_user_luckhoidong()
+def kiemtra_id_user():
+    while danhsachuser != []:
+        nhap = input("Moi ban nhap ID user: ")
+        for user in danhsachuser:
+            if nhap not in user['id']:
+                return nhap
+                break
+        print("ID user nay da ton tai!")
+    else:
+        nhap = input("Moi ban nhap ID user: ")
+        return nhap
+def tao_user():
+    id_user = kiemtra_id_user()
+    user = {}
+    user['id'] = id_user
+    user['name'] = input("Moi ban nhap USERNAME cua user: ")
+    user['pass'] = input("Moi ban nhap PASSWORD cua user: ")
+    with open("danhsachuser.csv", "a") as f:
+        str_save = user['id'] + '#' + user['name'] + '#' + user['pass'] + '\n' 
+        f.write(str_save)
+        return
+def xoa_user():
+    nhap = input("Moi ban nhap ID user can xoa: ")
+    with open("danhsachuser.csv", "r") as f:
+        line = f.readline()
+        while line:
+            str_cut = line.split("#")
+            if nhap == str_cut[0]:
+                del line
+                print("Done!")
+                return
+    print("Khong co ID nay trong danh sach")
+xoa_user()
         
 
